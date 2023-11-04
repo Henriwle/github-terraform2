@@ -1,10 +1,4 @@
-locals {
-  workspace_suffix = terraform.workspace == "default" ? "" : "${terraform.workspace}"
 
-  kv_name    = terraform.workspace == "default" ? "${var.kv_name}" : "${var.kv_name}${local.workspace_suffix}"
-  sa_accesskey_name = terraform.workspace == "default" ? "${var.sa_accesskey_name}" : "${var.sa_accesskey_name}${local.workspace_suffix}"
-  vm_name = terraform.workspace == "default" ? "${var.vm_name}" : "${var.vm_name}${local.workspace_suffix}"
-}
 
 data "azurerm_client_config" "current" {}
 

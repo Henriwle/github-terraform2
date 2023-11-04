@@ -1,10 +1,3 @@
-locals {
-  workspace_suffix = terraform.workspace == "default" ? "" : "${terraform.workspace}"
-
-  vnet_name = terraform.workspace == "default" ? "${var.vnet_name}" : "${var.vnet_name}${local.workspace_suffix}"
-  nsg_name = terraform.workspace == "default" ? "${var.nsg_name}" : "${var.nsg_name}${local.workspace_suffix}"
-  subnet_name = terraform.workspace == "default" ? "${var.subnet_name}" : "${var.subnet_name}${local.workspace_suffix}"
-}
 
 resource "azurerm_network_security_group" "nsg" {
   name                = "${locals.nsg_name}"

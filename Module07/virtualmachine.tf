@@ -1,12 +1,4 @@
-locals {
-  workspace_suffix = terraform.workspace == "default" ? "" : "${terraform.workspace}"
 
-  vm_nic_name = terraform.workspace == "default" ? "${var.vm_nic_name}" : "${var.vm_nic_name}${local.workspace_suffix}"
-  vm_name = terraform.workspace == "default" ? "${var.vm_name}" : "${var.vm_name}${local.workspace_suffix}"
-  pip_name = terraform.workspace == "default" ? "${var.pip_name}" : "${var.pip_name}${local.workspace_suffix}"
-  vm_username = terraform.workspace == "default" ? "${var.vm_username}" : "${var.vm_username}${local.workspace_suffix}"
-
-}
 
 resource "azurerm_public_ip" "pip_vm" {
   name                = "${locals.pip_name}-${var.base_name}"
