@@ -7,7 +7,7 @@ variable "base_name" {
 
 variable "rg_name" {
   type        = string
-  default     = "rg"
+  default     = "rg-hwl"
   description = "Name of the resource group to create"
 }
 
