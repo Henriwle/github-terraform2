@@ -31,11 +31,3 @@ jobs:
       - name: Terraform workspace select or create dev
         run: terraform workspace select dev || terraform workspace new dev
         working-directory: ${{ env.WORKING_DIR }}
-      
-      - name: Terraform apply dev
-        run: terraform apply -auto-approve
-        working-directory: ${{ env.WORKING_DIR }}
-
-      - name: Test dev
-        run: ./validate.yml
-        working-directory: ${{ env.WORKING_DIR }}
