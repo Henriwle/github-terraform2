@@ -1,11 +1,19 @@
+locals {
+  workspace_suffix = terraform.workspace == "default" ? "" : "${terraform.workspace}"
+
+  vnet_name = terraform.workspace == "default" ? "${var.vnet_name}" : "${var.vnet_name}${local.workspace_suffix}"
+  nsg_name = terraform.workspace == "default" ? "${var.nsg_name}" : "${var.nsg_name}${local.workspace_suffix}"
+  subnet_name = terraform.workspace == "default" ? "${var.subnet_name}" : "${var.subnet_name}${local.workspace_suffix}"
+}
+
 resource "azurerm_network_security_group" "nsg" {
-  name                = var.nsg_name
+  name                = "${locals.nsg_name}"
   location            = azurerm_resource_group.rg-infra.location
   resource_group_name = azurerm_resource_group.rg-infra.name
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = var.vnet_name
+  name                = "${locals.vnet_name}"
   location            = azurerm_resource_group.rg-infra.location
   resource_group_name = azurerm_resource_group.rg-infra.name
   address_space       = ["10.0.0.0/16"]
@@ -13,7 +21,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = var.subnet_name
+  name                 = "${locals.subnet_name}"
   resource_group_name  = azurerm_resource_group.rg-infra.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.0.0.0/24"]
