@@ -66,6 +66,7 @@ jobs:
 
     - name: Merge to Dev
       run: |
+        git fetch origin dev
         # Switch to the existing dev branch
         git checkout dev
 
