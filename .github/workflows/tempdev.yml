@@ -56,28 +56,9 @@ jobs:
           soft_fail: true
         # Space separated args specified here will be added during tfsec execution.
         # (eg. --force-all-dirs --verbose)
-
-  tflint:
-    needs: tfsec
-    runs-on: ubuntu-latest
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      - name: Setup TFLint
-      # You may pin to the exact commit or the version.
-      # uses: terraform-linters/setup-tflint@19a52fbac37dacb22a09518e4ef6ee234f2d4987
-        uses: terraform-linters/setup-tflint@v4.0.0
-        with:
-          # TFLint version to install
-          tflint_version: default # optional, default is latest
-          # GitHub token - used when getting the latest version of tflint
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Installs a wrapper script to wrap subsequent calls to `tflint` and expose `stdout`, `stderr`, and `exitcode` outputs
-          tflint_wrapper: false # optional, default is false
   
   merge-to-dev:
-    needs: tflint
+    needs: tfsec
     runs-on: ubuntu-latest
     steps:
     - name: Merge branch to dev
