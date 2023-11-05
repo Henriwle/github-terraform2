@@ -52,7 +52,7 @@ jobs:
         with:
           # Directory to run the action on, from the repo root. Default is . (root of the repository)
           working_directory: ${{ env.WORKING_DIR }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PAT_TOKEN }}
           soft_fail: true
         # Space separated args specified here will be added during tfsec execution.
         # (eg. --force-all-dirs --verbose)
@@ -61,18 +61,10 @@ jobs:
     needs: tfsec
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Merge to Dev
-      run: |
-        # Create and switch to the dev branch
-        git checkout -b dev
-
-        # Merge the changes from the push branch (assuming the push branch is the source branch)
-        git merge --no-ff ${{ github.ref }}
-
-        # Push the changes to the dev branch
-        git push origin dev
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2
+      - uses: everlytic/branch-merge@1.1.2
+        with:
+          github_token: ${{ secrets.PAT_TOKEN }}
+          source_ref: ${{ github.ref }}
+          target_branch: 'dev'
+          commit_message_template: '[Automated] Merged {source_ref} into target {target_branch}'
