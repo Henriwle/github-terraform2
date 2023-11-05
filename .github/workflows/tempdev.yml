@@ -1,0 +1,82 @@
+name: Terraform CI/CD temp_dev
+
+on:
+  push:
+    branches-ignore:
+      - 'prod'
+      - 'stage'
+      - 'dev'
+    paths:
+      - 'Module07/**'
+  workflow_dispatch:
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  WORKING_DIR: ./Module07
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+        working-directory: ${{ env.WORKING_DIR }}          
+
+      - name: Terraform Format
+        id: format
+        run: terraform fmt
+        working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+        working-directory: ${{ env.WORKING_DIR }}
+
+  tfsec:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under so your job can access it
+      - uses: actions/checkout@master
+      - name: tfsec
+        # You may pin to the exact commit or the version.
+        # uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          # Directory to run the action on, from the repo root. Default is . (root of the repository)
+          working_directory: ${{ env.WORKING_DIR }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          soft_fail: true
+        # Space separated args specified here will be added during tfsec execution.
+        # (eg. --force-all-dirs --verbose)
+  
+  merge-to-dev:
+    needs: tfsec
+    runs-on: ubuntu-latest
+    steps:
+    - name: Merge branch to dev
+      run: |
+        # Replace 'main' with the target branch you want to merge into
+        target_branch="dev"
+        base_branch="${{ github.ref }}"
+        
+        # Merge the branch using the GitHub REST API
+        PR_RESPONSE=$(curl -X POST -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          -d '{
+            "base": "'"$target_branch"'",
+            "head": "'"$base_branch"'",
+            "title": "Merge branch '$base_branch' into '$target_branch'"
+          }' \
+          "https://api.github.com/repos/${{ github.repository }}/pulls")
+
+        # Parse the PR URL from the response
+        PR_URL=$(echo "$PR_RESPONSE" | jq -r .html_url)
+
+        echo "Branch '$base_branch' merged into '$target_branch' by workflow. PR: $PR_URL"

@@ -5,12 +5,10 @@ name: Validate Infrastructure
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events
-  push:
-    branches-ignore:
-      - 'main'
-    paths:
-      - 'Module07/**'
-
+  workflow_run:
+    workflows: ["Terraform CI/CD temp_dev", "Terraform CI/CD stage_prod"]
+    types:
+      - completed
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
