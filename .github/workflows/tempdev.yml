@@ -63,11 +63,9 @@ jobs:
     steps:
     - name: Merge branch to dev
       run: |
-        # Replace 'main' with the target branch you want to merge into
         target_branch="dev"
         base_branch="${{ github.ref }}"
         
-        # Merge the branch using the GitHub REST API
         PR_RESPONSE=$(curl -X POST -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           -d '{
             "base": "'"$target_branch"'",
