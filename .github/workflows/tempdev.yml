@@ -61,20 +61,18 @@ jobs:
     needs: tfsec
     runs-on: ubuntu-latest
     steps:
-    - name: Merge branch to dev
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Merge to Dev
       run: |
-        target_branch="dev"
-        base_branch="${{ github.ref }}"
-        
-        PR_RESPONSE=$(curl -X POST -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -d '{
-            "base": "'"$target_branch"'",
-            "head": "'"$base_branch"'",
-            "title": "Merge branch '$base_branch' into '$target_branch'"
-          }' \
-          "https://api.github.com/repos/${{ github.repository }}/pulls")
+        # Create and switch to the dev branch
+        git checkout -b dev
 
-        # Parse the PR URL from the response
-        PR_URL=$(echo "$PR_RESPONSE" | jq -r .html_url)
+        # Merge the changes from the push branch (assuming the push branch is the source branch)
+        git merge --no-ff ${{ github.ref }}
 
-        echo "Branch '$base_branch' merged into '$target_branch' by workflow. PR: $PR_URL"
+        # Push the changes to the dev branch
+        git push origin dev
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
