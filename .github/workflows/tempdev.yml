@@ -61,20 +61,12 @@ jobs:
     needs: tfsec
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - uses: actions/checkout@master
 
-    - name: Merge to Dev
-      run: |
-        git fetch origin dev
-        # Switch to the existing dev branch
-        git checkout dev
-
-        # Fetch and merge the changes from the push branch
-        git fetch origin ${{ github.ref }}:$GITHUB_REF
-        git merge --no-ff $GITHUB_REF
-
-        # Push the changes to the dev branch
-        git push origin dev
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      - name: Merge branch -> dev
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: dev
+          message: Merge staging into uat
+          github_token: ${{ secrets.PAT_TOKEN }}
