@@ -61,10 +61,22 @@ jobs:
     needs: tfsec
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: everlytic/branch-merge@1.1.2
-        with:
-          github_token: ${{ secrets.PAT_TOKEN }}
-          source_ref: ${{ github.ref }}
-          target_branch: 'dev'
-          commit_message_template: '[Automated] Merged {source_ref} into target {target_branch}'
+      - run: |
+          # Extract the branch name from the fully qualified reference
+          branch_name="${{ github.ref }}"
+          
+          # Remove the "refs/heads/" prefix to get just the branch name
+          branch_name="${branch_name/refs\/heads\//}"
+          
+          # Ensure 'dev' branch is up to date
+          git fetch origin dev
+          
+          # Switch to the 'dev' branch
+          git checkout dev
+          
+          # Merge the saved branch (use $branch_name to reference the branch)
+          git merge --no-ff $branch_name
+          
+          # Push the changes to the 'dev' branch
+          git push origin dev
+        shell: bash
