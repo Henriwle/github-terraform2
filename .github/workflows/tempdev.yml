@@ -66,11 +66,12 @@ jobs:
 
     - name: Merge to Dev
       run: |
-        # Create and switch to the dev branch
-        git checkout -b dev
+        # Switch to the existing dev branch
+        git checkout dev
 
-        # Merge the changes from the push branch (assuming the push branch is the source branch)
-        git merge --no-ff ${{ github.ref }}
+        # Fetch and merge the changes from the push branch
+        git fetch origin ${{ github.ref }}:$GITHUB_REF
+        git merge --no-ff $GITHUB_REF
 
         # Push the changes to the dev branch
         git push origin dev
