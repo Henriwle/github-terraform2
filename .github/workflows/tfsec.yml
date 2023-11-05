@@ -26,7 +26,6 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       WORKING_DIR: ./Module07
-      GITHUB_TOKEN: ${{ secrets.AZURE_GITHUB_TOKEN }}
       
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -39,6 +38,6 @@ jobs:
         with:
           # Directory to run the action on, from the repo root. Default is . (root of the repository)
           working_directory: ${{ env.WORKING_DIR }}
-          github_token: ${{ env.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         # Space separated args specified here will be added during tfsec execution.
         # (eg. --force-all-dirs --verbose)
