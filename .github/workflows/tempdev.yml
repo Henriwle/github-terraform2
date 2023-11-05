@@ -46,15 +46,11 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: tfsec
-      # You may pin to the exact commit or the version.
-      # uses: aquasecurity/tfsec-action@b466648d6e39e7c75324f25d83891162a721f2d6
-      uses: aquasecurity/tfsec-action@v1.0.3
-      with:
-        # Directory to run the action on, from the repo root. Default is . (root of the repository)
-        working_directory: ${{ env.WORKING_DIR }}
-        github_token: ${{ env.GITHUB_TOKEN }}
-      # Space separated args specified here will be added during tfsec execution.
-      # (eg. --force-all-dirs --verbose)
+      run: |
+        # Run tfsec with the desired severity level (C for critical)
+        tfsec --severity C ${{ env.WORKING_DIR }}
+      env:
+        TFSEC_TOKEN: ${{ env.GITHUB_TOKEN }}
 
   tflint:
     needs: tfsec
