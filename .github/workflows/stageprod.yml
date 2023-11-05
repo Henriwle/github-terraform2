@@ -47,7 +47,7 @@ jobs:
         with:
           # Directory to run the action on, from the repo root. Default is . (root of the repository)
           working_directory: ${{ env.WORKING_DIR }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PAT_TOKEN }}
           soft_fail: true
         # Space separated args specified here will be added during tfsec execution.
         # (eg. --force-all-dirs --verbose)
