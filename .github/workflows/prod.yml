@@ -1,4 +1,4 @@
-name: Terraform CI/CD stage_prod
+name: Terraform CI/CD Prod
 
 on:
   pull_request:
