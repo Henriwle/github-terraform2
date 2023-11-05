@@ -61,22 +61,25 @@ jobs:
     needs: tfsec
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          # Extract the branch name from the fully qualified reference
-          branch_name="${{ github.ref }}"
-          
-          # Remove the "refs/heads/" prefix to get just the branch name
-          branch_name="${branch_name/refs\/heads\//}"
-          
-          # Ensure 'dev' branch is up to date
-          git fetch origin dev
-          
-          # Switch to the 'dev' branch
-          git checkout dev
-          
-          # Merge the saved branch (use $branch_name to reference the branch)
-          git merge --no-ff $branch_name
-          
-          # Push the changes to the 'dev' branch
-          git push origin dev
-        shell: bash
+      - name: Merge to Dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          BASE_URL="https://api.github.com/repos/Henriwle/github-terraform2"
+          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+          RESPONSE=$(curl -X POST -H "Authorization: token $GITHUB_TOKEN" -d '{"base": "dev", "head": "'"$CURRENT_BRANCH"'", "commit_message": "Merge $CURRENT_BRANCH into dev"}' "$BASE_URL/pulls")
+          PR_URL=$(echo "$RESPONSE" | jq -r .url)
+          echo "Pull request URL: $PR_URL"
+
+      - name: Merge Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BASE_URL="https://api.github.com/repos/Henriwle/github-terraform2"
+          PR_NUMBER=$(curl -H "Authorization: token $GITHUB_TOKEN" "$BASE_URL/pulls" | jq -r '.[] | select(.head.ref == "'"$CURRENT_BRANCH"'") | .number')
+          if [ "$PR_NUMBER" ]; then
+            RESPONSE=$(curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -d '{"commit_title": "Merge pull request", "merge_method": "merge"}' "$BASE_URL/pulls/$PR_NUMBER/merge")
+            echo "Pull request merged: $PR_NUMBER"
+          else
+            echo "Pull request not found."
+          fi
