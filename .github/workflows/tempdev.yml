@@ -31,3 +31,6 @@ jobs:
       - name: Terraform workspace select or create dev
         run: terraform workspace select dev || terraform workspace new dev
         working-directory: ${{ env.WORKING_DIR }}
+
+      - name: Run validate ++
+        uses: ./.github/workflows/validate.yml  # Path to the run-tfsec workflow file
